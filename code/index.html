@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#ffffff" />
+<title>答题 · 学习通</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- 桌面端：手机外框。手机端自动铺满 -->
+<div class="phone">
+  <div class="app" id="app">
+
+   <!-- ==================== 初始设置页 ==================== -->
+   <div class="view view--setup" id="viewSetup">
+     <header class="fnav">
+       <button class="fnav__back" id="btnSetupBack" aria-label="返回">
+         <svg width="11" height="20" viewBox="0 0 11 20" fill="none" aria-hidden="true">
+           <path d="M9.4 1 1.6 10l7.8 9" stroke="currentColor" stroke-width="1.8"
+                 stroke-linecap="round" stroke-linejoin="round"/>
+         </svg>
+       </button>
+       <h1 class="fnav__title">考试设置</h1>
+     </header>
+
+     <h2 class="fhero">词汇测试</h2>
+
+     <p class="ftime">
+       <span class="ftime__label">当前时间</span>
+       <time class="ftime__value" id="setupNow">2026-11-06 08:11:38</time>
+     </p>
+
+     <div class="fcard setup-card">
+       <label class="setup-row">
+         <span class="setup-row__k">姓名</span>
+         <input class="setup-row__v setup-row__v--text" id="inpName" type="text"
+                maxlength="20" placeholder="请输入姓名" autocomplete="name">
+         <span class="setup-row__u"></span>
+       </label>
+       <label class="setup-row">
+         <span class="setup-row__k">学号</span>
+         <input class="setup-row__v setup-row__v--text" id="inpId" type="text"
+                maxlength="20" placeholder="请输入学号" autocomplete="off" inputmode="numeric">
+         <span class="setup-row__u"></span>
+       </label>
+       <label class="setup-row">
+         <span class="setup-row__k">题目数量</span>
+         <input class="setup-row__v" id="inpCount" type="number" inputmode="numeric"
+                min="1" max="100" step="1" value="50">
+         <span class="setup-row__u">题</span>
+       </label>
+       <label class="setup-row">
+         <span class="setup-row__k">试卷总分</span>
+         <input class="setup-row__v" id="inpScore" type="number" inputmode="decimal"
+                min="1" max="1000" step="0.5" value="50.0">
+         <span class="setup-row__u">分</span>
+       </label>
+       <label class="setup-row">
+         <span class="setup-row__k">考试时长</span>
+         <input class="setup-row__v" id="inpTime" type="number" inputmode="numeric"
+                min="1" max="300" step="1" value="60">
+         <span class="setup-row__u">分钟</span>
+       </label>
+     </div>
+
+     <button class="setup-start" id="btnStart" type="button">开始答题</button>
+     <p class="setup-note">开始后将进入答题，倒计时同时启动</p>
+   </div>
+
+   <!-- ==================== 答题页 ==================== -->
+   <div class="view" id="viewQuiz" hidden>
+
+    <!-- ============ 导航栏 ============ -->
+    <header class="navbar">
+      <button class="nav-back" id="btnBack" aria-label="返回">
+        <svg width="10" height="17.5" viewBox="0 0 10 17.5" fill="none" aria-hidden="true">
+          <path d="M8.9 0.9 1.3 8.75 8.9 16.6" stroke="currentColor" stroke-width="1.7"
+                stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <h1 class="nav-title" id="navTitle">—</h1>
+    </header>
+
+    <!-- ============ 答题信息条 ============ -->
+    <section class="infobar">
+      <svg class="ib-clock" width="17" height="17" viewBox="0 0 17 17" fill="none">
+        <circle cx="8.5" cy="8.5" r="7.8" stroke="currentColor" stroke-width="1.35"/>
+        <path d="M8.5 4.3V8.7l2.9 1.9" stroke="currentColor" stroke-width="1.35"
+              stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span class="ib-timer" id="timer">59' 29"</span>
+      <span class="ib-counter" id="counter">3/50</span>
+      <div class="ib-progress" role="progressbar" aria-valuemin="1" aria-valuemax="50" aria-valuenow="3">
+        <span class="ib-progress__fill" id="progressFill"></span>
+      </div>
+      <button class="ib-answer-card" id="btnAnswerCard">
+        <svg width="17" height="17" viewBox="0 0 17 17" fill="none">
+          <rect x="0.9" y="0.9" width="15.2" height="15.2" rx="3.4"
+                stroke="currentColor" stroke-width="1.5"/>
+          <path d="M4.1 5.6l1.15 1.15L7.5 4.5" stroke="currentColor" stroke-width="1.35"
+                stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M9.4 5.85h3.7" stroke="currentColor" stroke-width="1.35" stroke-linecap="round"/>
+          <path d="M4.1 10.7l1.15 1.15L7.5 9.6" stroke="currentColor" stroke-width="1.35"
+                stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M9.4 10.95h3.7" stroke="currentColor" stroke-width="1.35" stroke-linecap="round"/>
+        </svg>
+        <span class="ib-answer-card__label">答题卡</span>
+      </button>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ============ 内容区（可滚动） ============ -->
+    <main class="content" id="content">
+      <h2 class="section-title" id="sectionTitle">单选题 （共50题，50.0分）</h2>
+
+      <p class="stem" id="stem"></p>
+
+      <ul class="options" id="options" role="radiogroup" aria-label="选项"></ul>
+    </main>
+
+    <!-- ============ 底部操作栏 ============ -->
+    <footer class="bottombar">
+      <button class="btn-prev" id="btnPrev">上一题</button>
+      <button class="btn-next" id="btnNext">下一题</button>
+    </footer>
+
+   </div><!-- /viewQuiz -->
+
+   <!-- ==================== 交卷结果页（参考图 finished.jpg） ==================== -->
+   <div class="view view--finish" id="viewFinish" hidden>
+     <header class="fnav">
+       <button class="fnav__back" id="btnFinishBack" aria-label="返回">
+         <svg width="11" height="20" viewBox="0 0 11 20" fill="none" aria-hidden="true">
+           <path d="M9.4 1 1.6 10l7.8 9" stroke="currentColor" stroke-width="1.8"
+                 stroke-linecap="round" stroke-linejoin="round"/>
+         </svg>
+       </button>
+       <h1 class="fnav__title">词汇测试</h1>
+       <button class="fnav__action" id="btnFeedback">反馈</button>
+     </header>
+
+     <h2 class="fhero">交卷成功</h2>
+
+     <p class="ftime">
+       <span class="ftime__label">当前时间</span>
+       <time class="ftime__value" id="finishNow">2026-11-06 08:11:38</time>
+     </p>
+
+     <dl class="fcard" id="finishCard"></dl>
+
+     <p class="fhint">本试卷考后不允许查看</p>
+   </div>
+
+   <!-- ============ 全屏水印（参考图上的 张三 / 20230001） ============ -->
+   <div class="watermark" aria-hidden="true"></div>
+
+   <!-- ============ 前置摄像头小窗（可拖动） ============ -->
+   <div class="cam" id="cam" role="button" tabindex="0" aria-label="前置摄像头画面，可拖动" hidden>
+     <video id="camVideo" autoplay playsinline muted></video>
+     <div class="cam__tip" id="camTip">开启<br>前置摄像头</div>
+   </div>
+
+    <!-- ============ 答题卡面板（参考图未展示，按同一设计语言补全） ============ -->
+    <div class="sheet-mask" id="sheetMask" hidden>
+      <div class="sheet" role="dialog" aria-modal="true" aria-label="答题卡">
+        <div class="sheet__head">
+          <span class="sheet__title">答题卡</span>
+          <button class="sheet__close" id="sheetClose" aria-label="关闭">✕</button>
+        </div>
+        <div class="sheet__legend">
+          <span><i class="dot dot--done"></i>已答</span>
+          <span><i class="dot dot--now"></i>当前</span>
+          <span><i class="dot dot--todo"></i>未答</span>
+        </div>
+        <div class="sheet__grid" id="sheetGrid"></div>
+      </div>
+    </div>
+
+    <div class="toast" id="toast" hidden></div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

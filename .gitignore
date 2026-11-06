@@ -1,0 +1,14 @@
+# 本地临时文件（截图脚本、Chrome profile 等）
+code/_*
+docs/_*
+_*
+
+# 参考截图（含姓名 / 学号水印，不入库）
+参考图/
+
+# 系统 / 编辑器
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/

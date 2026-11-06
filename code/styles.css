@@ -1,0 +1,810 @@
+﻿/* ============================================================
+   学习通 · 答题页（1:1 复刻）
+   尺寸全部来自 docs/答题页布局说明.md 的实测值（参考图为 1260px 宽 / 3×）
+   CSS 中的 px 均按「参考图物理像素 ÷ 3」换算
+   ============================================================ */
+
+:root {
+  /* ---- 颜色 ---- */
+  --brand:        #0099FF;
+  --brand-soft:   #F2FBFF;   /* 选中项底色 ≈ rgba(0,153,255,.05) 叠白 */
+  --text-1:       #262626;
+  --text-2:       #5A5A5A;
+  --text-3:       #8C8C8C;
+  --surface:      #FFFFFF;
+  --card:         #FCFCFC;
+  --card-line:    #E9E9E9;
+  --divider:      #F1F1F1;
+  --track:        #F0F1F3;
+  --icon:         #333333;
+  --icon-muted:   #666666;
+
+  /* ---- 尺寸（px = 参考图像素 / 3） ---- */
+  --pad:          16.67px;   /* 页面左右留白 50px */
+  --sb-h:         50px;      /* 状态栏 */
+  --nav-h:        46px;      /* 导航栏 */
+  --info-h:       54px;      /* 信息条 */
+  --card-h:       58px;      /* 选项卡片高 174px */
+  --card-gap:     14.67px;   /* 卡片间距 44px */
+  --card-radius:  2.67px;    /* 圆角 8px */
+  --card-pad-x:   16.33px;   /* 卡片左内边距 52px */
+  --key-w:        29px;      /* 字母列宽 87px */
+  --btn-h:        44px;      /* 主按钮高 132px */
+  --btn-radius:   4.67px;    /* 按钮圆角 14px */
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  display: grid;
+  place-items: center;
+  min-height: 100dvh;
+  background: #E9EDF2;
+  font-family: "Helvetica Neue", Helvetica, Arial, "PingFang SC",
+               "HarmonyOS Sans SC", "Microsoft YaHei", "Noto Sans SC", Roboto, sans-serif;
+  color: var(--text-1);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ---------- 桌面端手机外框（420 × 917 = 1260 × 2750 / 3） ---------- */
+.phone {
+  position: relative;
+  width: 420px;
+  height: 917px;
+  background: var(--surface);
+  border-radius: 0;
+  overflow: hidden;
+  box-shadow: 0 26px 70px rgba(15, 23, 42, .20), 0 0 0 1px rgba(15, 23, 42, .06);
+}
+
+.app {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--surface);
+  /* 状态栏由手机系统绘制，页面不画；这里只留出同样的顶部留白（参考图 50px） */
+  padding-top: max(50px, env(safe-area-inset-top, 0px));
+}
+
+/* 桌面端：外框按需缩放，避免出现滚动条 */
+@media (min-width: 521px) {
+  body { overflow: hidden; }
+}
+
+/* 手机端 / 窄窗口：铺满视口 */
+@media (max-width: 520px) {
+  body { display: block; background: var(--surface); }
+  .phone {
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    box-shadow: none;
+    border-radius: 0;
+  }
+}
+
+/* ============================================================
+   2. 导航栏
+   ============================================================ */
+.navbar {
+  position: relative;
+  flex: none;
+  height: var(--nav-h);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-back {
+  position: absolute;
+  left: 9.3px;
+  margin-top: -1.4px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--icon);
+  cursor: pointer;
+  border-radius: 50%;
+}
+.nav-back:active { background: rgba(0, 0, 0, .06); }
+
+.nav-title {
+  margin: 0;
+  font-size: 20.6px;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: .1px;
+  color: var(--text-1);
+  white-space: nowrap;
+}
+
+/* ============================================================
+   3. 答题信息条
+   ============================================================ */
+.infobar {
+  flex: none;
+  height: var(--info-h);
+  display: flex;
+  align-items: center;
+  padding: 10.3px var(--pad) 0 17.2px;
+  gap: 9.33px;
+  color: var(--text-2);
+}
+
+.ib-clock { flex: none; color: var(--icon-muted); }
+
+.ib-timer {
+  font-size: 15.5px;
+  line-height: 1;
+  color: var(--text-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.ib-counter {
+  margin-left: 17.83px;   /* 计时与题号间距 93px */
+  font-size: 17.5px;
+  line-height: 1;
+  color: var(--text-1);
+  font-variant-numeric: tabular-nums;
+}
+
+.ib-progress {
+  position: relative;
+  width: 90px;            /* 270px（实测 3/50、16/50、36/50 三张图均为 ≈270） */
+  height: 8.67px;         /* 26px */
+  margin-left: 3.5px;
+  border-radius: 2.67px;  /* 8px */
+  background: var(--track);
+  flex: none;
+  overflow: hidden;
+}
+
+/* 已完成部分：与轨道等高、左对齐、按 n/总题数 拉伸 */
+.ib-progress__fill {
+  display: block;
+  height: 100%;
+  width: 6%;
+  border-radius: 2.67px;
+  background: var(--brand);
+  transition: width .25s cubic-bezier(.4, 0, .2, 1);
+}
+
+.ib-answer-card {
+  position: relative;
+  top: -2.33px;
+  margin-left: auto;
+  margin-right: 14.27px;   /* 参考图中该入口比内容右边界多缩进 45px */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--icon);
+  cursor: pointer;
+}
+.ib-answer-card:active { opacity: .6; }
+
+.ib-answer-card__label {
+  font-size: 10px;
+  line-height: 1;
+  color: var(--text-1);
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+
+/* ============================================================
+   4. 分割线
+   ============================================================ */
+.divider {
+  flex: none;
+  height: 1px;
+  margin-top: 6px;
+  background: var(--divider);
+}
+
+/* ============================================================
+   5. 内容区
+   ============================================================ */
+.content {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0 var(--pad) 8px;
+  scrollbar-width: none;
+}
+.content::-webkit-scrollbar { width: 0; height: 0; }
+
+.section-title {
+  margin: 14.6px 0 0;
+  font-size: 19.5px;
+  font-weight: 700;
+  line-height: 1.16;
+  color: var(--text-1);
+  text-align: justify;          /* 还原参考图的 justify 排版 */
+}
+
+.stem {
+  margin: 11px 0 0;
+  font-size: 17px;
+  line-height: 1.863;
+  color: var(--text-1);
+  /* 中文版改用左对齐：序号 + 「（1.0分）」前缀很短，justify 会把词距拉得过大 */
+  text-align: left;
+}
+
+.stem__head { white-space: nowrap; }
+
+.stem__no { color: var(--text-1); }
+
+.stem__score {
+  display: inline-block;      /* 独立成块，避免断开或拉伸 */
+  white-space: nowrap;
+  margin-left: .42em;
+  color: var(--text-3);
+}
+
+/* 「the ______」整体不换行，复刻参考图的断行位置 */
+.nw { white-space: nowrap; }
+
+/* 填空下划线：参考图 228 × 4 px → 76 × 1.33 px，落在基线上 */
+.blank {
+  display: inline-block;
+  width: 76px;
+  height: 0;
+  border-bottom: 1.4px solid currentColor;
+  vertical-align: baseline;
+}
+
+/* ---- 选项列表 ---- */
+.options {
+  margin: 54px 0 0;           /* 参考图此处有 190px（≈63px）空白 */
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--card-gap);
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: var(--card-h);
+  padding: 0 var(--card-pad-x);
+  border: 1px solid var(--card-line);
+  border-radius: var(--card-radius);
+  background: var(--card);
+  color: var(--text-1);
+  font-family: inherit;
+  font-size: 18.5px;
+  font-weight: 400;
+  line-height: 1.3;
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  transition: background-color .12s ease, border-color .12s ease, color .12s ease;
+}
+
+.option__key {
+  flex: none;
+  width: var(--key-w);
+}
+
+.option__text {
+  flex: 1;
+  min-width: 0;
+}
+
+/* 选中态：只变颜色，几何不动 */
+.option.is-selected {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+  color: var(--brand);
+}
+
+.option:active {
+  background: #F4F4F4;
+}
+.option.is-selected:active {
+  background: #E8F7FF;
+}
+
+.option:focus-visible {
+  outline: 2px solid rgba(0, 153, 255, .45);
+  outline-offset: 2px;
+}
+
+/* ============================================================
+   6. 底部操作栏
+   ============================================================ */
+.bottombar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px var(--pad) max(33px, env(safe-area-inset-bottom, 0px));
+  background: var(--surface);
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, .03);
+}
+
+.btn-prev,
+.btn-next {
+  font-family: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn-prev {
+  flex: none;
+  height: var(--btn-h);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--brand);
+  font-size: 16px;
+  white-space: nowrap;
+}
+.btn-prev:disabled {
+  color: #C4C4C4;
+  cursor: default;
+}
+
+.btn-next {
+  flex: 1;
+  min-width: 0;
+  height: var(--btn-h);
+  border: 0;
+  border-radius: var(--btn-radius);
+  background: var(--brand);
+  color: #fff;
+  font-size: 16px;
+  letter-spacing: .1px;
+}
+.btn-next:active { background: #0088E6; }
+
+/* ============================================================
+   7. 答题卡面板（参考图未展示，按同一套设计语言补全）
+   ============================================================ */
+.sheet-mask {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: flex-end;
+  background: rgba(0, 0, 0, .40);
+  animation: fade .18s ease;
+}
+.sheet-mask[hidden] { display: none; }
+
+.sheet {
+  width: 100%;
+  max-height: 72%;
+  display: flex;
+  flex-direction: column;
+  padding: 18px var(--pad) calc(18px + env(safe-area-inset-bottom));
+  background: #fff;
+  border-radius: 14px 14px 0 0;
+  animation: slide-up .24s cubic-bezier(.4, 0, .2, 1);
+}
+
+.sheet__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.sheet__title {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text-1);
+}
+
+.sheet__close {
+  width: 32px;
+  height: 32px;
+  margin-right: -6px;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--text-3);
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.sheet__legend {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 14px;
+  font-size: 11px;
+  color: var(--text-3);
+}
+.sheet__legend span { display: inline-flex; align-items: center; gap: 5px; }
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.dot--done { background: var(--brand-soft); border: 1.5px solid var(--brand); }
+.dot--now  { background: var(--brand); }
+.dot--todo { background: #E4E4E4; }
+
+.sheet__grid {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 9px;
+  padding-bottom: 4px;
+}
+
+.sheet__cell {
+  height: 38px;
+  border: 1px solid var(--card-line);
+  border-radius: 4px;
+  background: var(--card);
+  color: var(--text-2);
+  font-family: inherit;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+.sheet__cell.is-done {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+  color: var(--brand);
+}
+.sheet__cell.is-now {
+  border-color: var(--brand);
+  background: var(--brand);
+  color: #fff;
+}
+
+/* ============================================================
+   8. Toast
+   ============================================================ */
+.toast {
+  position: absolute;
+  left: 50%;
+  bottom: 118px;
+  z-index: 30;
+  transform: translateX(-50%);
+  padding: 9px 16px;
+  border-radius: 6px;
+  background: rgba(38, 38, 38, .88);
+  color: #fff;
+  font-size: 13px;
+  white-space: nowrap;
+  animation: fade .2s ease;
+}
+.toast[hidden] { display: none; }
+
+@keyframes fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes slide-up {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+/* ============================================================
+   9. 视图容器（答题页 / 交卷结果页）
+   ============================================================ */
+.view {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.view[hidden] { display: none; }
+
+/* ============================================================
+   10. 交卷结果页（参考图 finished.jpg，无状态栏）
+   ============================================================ */
+.view--finish { background: var(--surface); }
+
+.fnav {
+  position: relative;
+  flex: none;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fnav__title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.2;
+  color: #333333;
+}
+
+.fnav__back {
+  position: absolute;
+  left: 1.5px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #333333;
+  cursor: pointer;
+}
+.fnav__back:active { opacity: .55; }
+
+.fnav__action {
+  position: absolute;
+  right: 17.7px;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 8px 0 8px 12px;
+  border: 0;
+  background: none;
+  font-family: inherit;
+  font-size: 16.5px;
+  color: var(--brand);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.fnav__action:active { opacity: .6; }
+
+/* 主标题 */
+.fhero {
+  margin: 92.3px 0 0;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--brand);
+  text-align: center;
+}
+
+/* 当前时间 */
+.ftime {
+  margin: 21.4px 0 0;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 12px;
+  white-space: nowrap;
+}
+.ftime__label {
+  font-size: 16px;
+  font-weight: 600;
+  color: #5E5E5E;
+}
+.ftime__value {
+  font-size: 21.2px;
+  font-weight: 600;
+  color: #5E5E5E;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: .2px;
+}
+
+/* 信息卡片 */
+.fcard {
+  margin: 14.8px 44.67px 0;
+  padding: 12.6px 17.7px 10.8px;
+  border-radius: 4px;
+  background: #F7F8FA;
+}
+
+.fcard__row {
+  display: flex;
+  align-items: center;
+  height: 35px;
+  font-size: 16.7px;
+  line-height: 1.2;
+  color: #8E8E93;
+}
+
+.fcard__k { flex: none; }
+.fcard__v { flex: 1; min-width: 0; }
+
+/* 底部说明 */
+.fhint {
+  margin: auto 0 0;
+  padding-bottom: 95.3px;
+  font-size: 16.2px;
+  line-height: 1.4;
+  color: #86868B;
+  text-align: center;
+}
+
+/* ============================================================
+   11. 可选：修正版（去掉参考图里的排版缺陷）
+   在 <body> 上加 class="clean" 即可得到「修正后」的版本：
+   - 取消两端对齐
+   - 底部操作栏恢复与全页一致的 16.67 内边距
+   - 信息条元素对齐内容右边界
+   ============================================================ */
+body.clean .section-title,
+body.clean .stem {
+  text-align: left;
+}
+body.clean .bottombar {
+  gap: 12px;
+  padding: 14px var(--pad) max(33px, env(safe-area-inset-bottom, 0px));
+}
+body.clean .ib-answer-card {
+  margin-right: 0;
+}
+
+/* ============================================================
+   12. 全屏水印（参照参考图：张三 / 20230001，倾斜平铺）
+   ============================================================ */
+.watermark {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  background-repeat: repeat;
+  background-size: 242px 236.33px;   /* 平铺间距：726 × 709 参考图像素 */
+  background-position: -4px -3.4px;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* ============================================================
+   13. 前置摄像头小窗（右上角，可拖动）
+   ============================================================ */
+.cam {
+  position: absolute;
+  top: 58px;
+  right: 10px;
+  width: 96px;
+  height: 128px;      /* 竖向长方形 3:4 */
+  border-radius: 10px;
+  overflow: hidden;
+  background: #1C1C1E;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, .18), 0 0 0 1px rgba(0, 0, 0, .06);
+  z-index: 15;
+  touch-action: none;
+  cursor: grab;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.cam:active { cursor: grabbing; }
+.cam.is-dragging { cursor: grabbing; }
+
+.cam video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scaleX(-1);      /* 前置镜像 */
+  pointer-events: none;
+  background: #1C1C1E;
+}
+
+.cam__tip {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  color: #FFFFFF;
+  font-size: 11px;
+  line-height: 1.45;
+  text-align: center;
+  letter-spacing: .2px;
+}
+.cam__tip[hidden] { display: none; }
+
+.cam.is-off video { opacity: 0; }
+
+/* ============================================================
+   14. 初始设置页（题数 / 总分 / 时长）
+   ============================================================ */
+.view--setup { background: var(--surface); }
+
+.setup-card {
+  margin-top: 24px;
+  padding: 0 17.7px;
+}
+
+.setup-row {
+  display: flex;
+  align-items: center;
+  height: 54px;
+  border-bottom: 1px solid #EFEFF2;
+  font-size: 16.5px;
+  color: #262626;
+}
+.setup-row:last-child { border-bottom: 0; }
+.setup-row:focus-within { border-bottom-color: var(--brand); }
+
+.setup-row__k {
+  flex: none;
+  color: #4A4A4F;
+  letter-spacing: .2px;
+}
+
+.setup-row__v {
+  flex: 1;
+  min-width: 0;
+  margin-left: 12px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: inherit;
+  font-size: 17px;
+  line-height: 1.2;
+  color: #262626;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+.setup-row__v:focus { outline: none; }
+.setup-row__v::-webkit-outer-spin-button,
+.setup-row__v::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.setup-row__v--text {
+  text-align: right;
+  font-size: 16.5px;
+}
+.setup-row__v--text::placeholder {
+  color: #C2C2C7;
+}
+
+.setup-row__u {
+  flex: none;
+  margin-left: 14px;
+  text-align: left;
+  font-size: 15px;
+  color: #8E8E93;
+}
+
+.setup-start {
+  margin: 26px 44.67px 0;
+  height: 46px;
+  border: 0;
+  border-radius: 4.67px;
+  background: var(--brand);
+  color: #FFFFFF;
+  font-family: inherit;
+  font-size: 16.5px;
+  letter-spacing: .5px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.setup-start:active { background: #0088E6; }
+
+.setup-note {
+  margin: 22px 0 0;
+  font-size: 12.5px;
+  color: #9A9AA0;
+  text-align: center;
+}
