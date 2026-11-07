@@ -148,7 +148,11 @@
     finishCard: $('finishCard'),
     finishNow: $('finishNow'),
     finishBack: $('btnFinishBack'),
-    feedback: $('btnFeedback')
+    feedback: $('btnFeedback'),
+
+    // 全屏守卫
+    fullscreenLock: $('fullscreenLock'),
+    restoreFullscreen: $('btnRestoreFullscreen')
   };
 
   // ----------------------------------------------------------
@@ -156,6 +160,38 @@
   // ----------------------------------------------------------
   function clamp(v, min, max) {
     return Math.min(max, Math.max(min, v));
+  }
+
+  function fullscreenElement() {
+    return document.fullscreenElement || document.webkitFullscreenElement || null;
+  }
+
+  function requestFullscreen() {
+    const target = document.documentElement;
+    const request = target.requestFullscreen || target.webkitRequestFullscreen;
+    if (!request) return Promise.reject(new Error('fullscreen-not-supported'));
+    try {
+      const result = request.call(target);
+      return result && typeof result.then === 'function' ? result : Promise.resolve();
+    } catch (err) {
+      return Promise.reject(err);
+    }
+  }
+
+  function exitFullscreen() {
+    const exit = document.exitFullscreen || document.webkitExitFullscreen;
+    if (!fullscreenElement() || !exit) return Promise.resolve();
+    try {
+      const result = exit.call(document);
+      return result && typeof result.then === 'function' ? result : Promise.resolve();
+    } catch (err) {
+      return Promise.reject(err);
+    }
+  }
+
+  function syncFullscreenLock() {
+    const mustLock = state.running && el.viewQuiz && !el.viewQuiz.hidden && !fullscreenElement();
+    el.fullscreenLock.hidden = !mustLock;
   }
 
   function pad2(n) { return n < 10 ? '0' + n : String(n); }
@@ -392,10 +428,30 @@
     if (window.__examCam) window.__examCam.start();
   }
 
-  el.btnStart.addEventListener('click', function () {
+  el.btnStart.addEventListener('click', async function () {
     const cfg = readSetup();
-    if (cfg) startExam(cfg);
+    if (!cfg) return;
+
+    try {
+      if (!fullscreenElement()) await requestFullscreen();
+      startExam(cfg);
+      syncFullscreenLock();
+    } catch (err) {
+      showToast('请允许全屏后再开始答题');
+    }
   });
+
+  el.restoreFullscreen.addEventListener('click', async function () {
+    try {
+      await requestFullscreen();
+      syncFullscreenLock();
+    } catch (err) {
+      showToast('浏览器未允许进入全屏');
+    }
+  });
+
+  document.addEventListener('fullscreenchange', syncFullscreenLock);
+  document.addEventListener('webkitfullscreenchange', syncFullscreenLock);
 
   // 输入姓名 / 学号时，水印实时跟着变
   function syncWatermark() {
@@ -458,8 +514,10 @@
     el.viewQuiz.hidden = true;
     el.viewSetup.hidden = false;
     if (window.__examCam) window.__examCam.stop();
+    el.fullscreenLock.hidden = true;
+    exitFullscreen().catch(function () {});
     updateSetupClock();
-  renderWatermark('', '');
+    renderWatermark('', '');
   }
 
   el.finishBack.addEventListener('click', backToSetup);

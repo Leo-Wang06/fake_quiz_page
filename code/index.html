@@ -66,7 +66,7 @@
      </div>
 
      <button class="setup-start" id="btnStart" type="button">开始答题</button>
-     <p class="setup-note">开始后将进入答题，倒计时同时启动</p>
+     <p class="setup-note">开始时将强制进入全屏，倒计时同时启动</p>
    </div>
 
    <!-- ==================== 答题页 ==================== -->
@@ -176,6 +176,14 @@
           <span><i class="dot dot--todo"></i>未答</span>
         </div>
         <div class="sheet__grid" id="sheetGrid"></div>
+      </div>
+    </div>
+
+    <div class="fullscreen-lock" id="fullscreenLock" hidden>
+      <div class="fullscreen-lock__card" role="dialog" aria-modal="true" aria-labelledby="fullscreenLockTitle">
+        <h2 id="fullscreenLockTitle">考试需要全屏</h2>
+        <p>检测到已退出全屏，请重新进入全屏后继续答题。</p>
+        <button type="button" id="btnRestoreFullscreen">重新进入全屏</button>
       </div>
     </div>
 
